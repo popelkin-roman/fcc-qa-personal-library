@@ -23,7 +23,7 @@ module.exports = function (app) {
       if (! title) {
         respond = "missing required field title";
       } else {
-        respond = {title, _id, commentcount: 0};
+        respond = {title, _id, comments: [], commentcount: 0};
         books.push(respond);
       }
       return res.json(respond);
@@ -39,18 +39,37 @@ module.exports = function (app) {
   app.route('/api/books/:id')
     .get(function (req, res){
       let bookid = req.params.id;
-      //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
+      let book = books.find(el => el._id === bookid);
+      if (! book) return res.json('no book exists')
+      return res.json(book)
     })
     
     .post(function(req, res){
       let bookid = req.params.id;
       let comment = req.body.comment;
-      //json res format same as .get
+      let bookIndex = books.findIndex(el => el._id === bookid);
+      let respond;
+
+      if (! comment) respond = 'missing required field comment'
+      else if (bookIndex < 0) respond = 'no book exists'
+      else {
+        books[bookIndex].comments.push(comment)
+        respond = books[bookIndex];
+      }
+      return res.json(respond)
+
     })
     
     .delete(function(req, res){
       let bookid = req.params.id;
-      //if successful response will be 'delete successful'
+      let bookIndex = books.findIndex(el => el._id === bookid);
+      let respond;
+      if (bookIndex < 0) respond = 'no book exists';
+      else {
+        books.splice(bookIndex, 1);
+        respond = 'delete successful'
+      }
+      return res.json(respond)
     });
 
     function createRandomId(length) {
