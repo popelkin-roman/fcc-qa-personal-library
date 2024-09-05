@@ -9,20 +9,29 @@
 'use strict';
 
 module.exports = function (app) {
+  let books = []
 
   app.route('/api/books')
     .get(function (req, res){
-      //response will be array of book objects
-      //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
+      return res.json(books);
     })
     
     .post(function (req, res){
       let title = req.body.title;
-      //response will contain new book object including atleast _id and title
+      let _id = createRandomId(10);
+      let respond;
+      if (! title) {
+        respond = "missing required field title";
+      } else {
+        respond = {title, _id, commentcount: 0};
+        books.push(respond);
+      }
+      return res.json(respond);
     })
     
     .delete(function(req, res){
-      //if successful response will be 'complete delete successful'
+      books = [];
+      return res.json('complete delete successful')
     });
 
 
@@ -43,5 +52,14 @@ module.exports = function (app) {
       let bookid = req.params.id;
       //if successful response will be 'delete successful'
     });
+
+    function createRandomId(length) {
+      let result = '';
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      for (let i = 0; i < length; i++) {
+          result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      return result;
+    }
   
 };
