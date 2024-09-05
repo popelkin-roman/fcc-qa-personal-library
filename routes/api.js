@@ -9,7 +9,7 @@
 'use strict';
 
 module.exports = function (app) {
-  let books = []
+  let books = [{title: 'Test book', _id: 'testId', commentcount: 0}]
 
   app.route('/api/books')
     .get(function (req, res){
